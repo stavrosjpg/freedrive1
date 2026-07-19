@@ -4,6 +4,7 @@ margin:0;
 overflow:hidden;
 background:black;
 font-family:Arial;
+touch-action:none;
 
 }
 
@@ -15,6 +16,8 @@ display:block;
 }
 
 
+
+/* Menü */
 
 #menu{
 
@@ -40,6 +43,15 @@ gap:15px;
 
 
 
+#menu h1{
+
+font-size:35px;
+text-align:center;
+
+}
+
+
+
 #menu button{
 
 width:260px;
@@ -54,6 +66,8 @@ cursor:pointer;
 }
 
 
+
+/* Geschwindigkeit */
 
 #speed{
 
@@ -72,6 +86,8 @@ z-index:5;
 
 
 
+/* Kamera Info */
+
 #cameraInfo{
 
 position:fixed;
@@ -82,5 +98,101 @@ left:20px;
 color:white;
 
 z-index:5;
+
+}
+
+
+
+/* Handy Steuerung */
+
+#mobileControls{
+
+position:fixed;
+
+bottom:20px;
+
+left:0;
+
+width:100%;
+
+display:flex;
+
+justify-content:center;
+
+gap:10px;
+
+z-index:20;
+
+}
+
+
+
+#mobileControls button{
+
+width:65px;
+height:65px;
+
+border-radius:50%;
+
+font-size:30px;
+
+background:#222;
+
+color:white;
+
+border:2px solid white;
+
+}
+
+
+
+#nitro{
+
+position:absolute;
+
+right:20px;
+
+bottom:100px;
+
+background:orange!important;
+
+}
+
+
+
+/* Handy Anpassung */
+
+@media(max-width:600px){
+
+#menu h1{
+
+font-size:26px;
+
+}
+
+
+#menu button{
+
+width:220px;
+
+height:55px;
+
+font-size:18px;
+
+}
+
+
+#speed{
+
+font-size:22px;
+
+}
+
+
+#cameraInfo{
+
+font-size:14px;
+
+}
 
 }

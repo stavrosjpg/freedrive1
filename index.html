@@ -4,28 +4,47 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stavros City Drive</title>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
 <div id="garage">
-    <h1>🏎️ Stavros City Drive</h1>
 
-    <button onclick="selectCar('Audi RS6')">Audi RS6</button>
-    <button onclick="selectCar('BMW M4 Competition')">BMW M4 Competition</button>
-    <button onclick="selectCar('Mercedes C63')">Mercedes C63</button>
+<h1>🏎️ Stavros City Drive</h1>
 
-    <h2 id="selected">Kein Auto ausgewählt</h2>
+<button id="rs6">
+Audi RS6
+</button>
 
-    <button onclick="startGame()">START FAHREN</button>
+<button id="m4">
+BMW M4 Competition
+</button>
+
+<button id="c63">
+Mercedes C63
+</button>
+
+<h2 id="selected">
+Kein Auto ausgewählt
+</h2>
+
+<button id="start">
+START FAHREN
+</button>
+
 </div>
 
 
-<div id="speed">0 km/h</div>
+<div id="speed">
+0 km/h
+</div>
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 <script src="game.js"></script>
 
 </body>

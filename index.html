@@ -9,14 +9,44 @@
 
 <body>
 
-<div id="speed">0 km/h</div>
+<div id="garage">
+<h1>🚗 Garage</h1>
+
+<button onclick="selectCar('Audi RS6')">
+Audi RS6
+</button>
+
+<button onclick="selectCar('BMW M4 Competition')">
+BMW M4 Competition
+</button>
+
+<button onclick="selectCar('Mercedes C63')">
+Mercedes C63
+</button>
+
+<p id="selected">Kein Auto ausgewählt</p>
+
+<button onclick="startGame()">
+START FAHREN
+</button>
+
+</div>
+
+
+<div id="speed">
+0 km/h
+</div>
+
 
 <div id="controls">
+
 <button id="left">⬅️</button>
 <button id="gas">⬆️</button>
 <button id="brake">⬇️</button>
 <button id="right">➡️</button>
+
 </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="game.js"></script>

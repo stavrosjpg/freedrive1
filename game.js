@@ -1,47 +1,29 @@
 let selectedCar = "";
 
-let scene;
-let camera;
-let renderer;
-let car;
-
-let speed = 0;
-let insideCamera = false;
-
-
 const cars = {
+    "Audi RS6": {
+        speed: 3.2,
+        color: 0x222222
+    },
 
-"Audi RS6":{
-    maxSpeed:3.2,
-    acceleration:0.04,
-    color:0x222222
-},
+    "BMW M4 Competition": {
+        speed: 3.0,
+        color: 0x0066ff
+    },
 
-"BMW M4 Competition":{
-    maxSpeed:2.9,
-    acceleration:0.05,
-    color:0x0066ff
-},
-
-"Mercedes C63":{
-    maxSpeed:3.0,
-    acceleration:0.045,
-    color:0xffffff
-}
-
+    "Mercedes C63": {
+        speed: 3.1,
+        color: 0xffffff
+    }
 };
 
 
-let keys={};
+function selectCar(carName){
 
+    selectedCar = carName;
 
-
-function selectCar(name){
-
-selectedCar=name;
-
-document.getElementById("selected").innerHTML=
-"Ausgewählt: "+name;
+    document.getElementById("selected").innerHTML =
+    "Ausgewählt: " + carName;
 
 }
 
@@ -49,373 +31,131 @@ document.getElementById("selected").innerHTML=
 
 function startGame(){
 
-if(selectedCar===""){
+    if(selectedCar === ""){
+        alert("Bitte erst ein Auto auswählen");
+        return;
+    }
 
-alert("Bitte erst ein Auto auswählen");
+    document.getElementById("garage").style.display="none";
 
-return;
-
-}
-
-
-document.getElementById("garage").style.display="none";
-
-
-createGame();
+    createGame();
 
 }
-
-
-
-
-document.addEventListener("keydown",e=>{
-
-keys[e.key.toLowerCase()]=true;
-
-
-if(e.key.toLowerCase()=="c"){
-
-insideCamera=!insideCamera;
-
-}
-
-});
-
-
-document.addEventListener("keyup",e=>{
-
-keys[e.key.toLowerCase()]=false;
-
-});
-
-
 
 
 
 function createGame(){
 
+    let scene = new THREE.Scene();
 
-scene=new THREE.Scene();
+    scene.background =
+    new THREE.Color(0x87ceeb);
 
-scene.background=
-new THREE.Color(0x87ceeb);
 
+    let camera = new THREE.PerspectiveCamera(
+        70,
+        window.innerWidth/window.innerHeight,
+        0.1,
+        5000
+    );
 
 
-camera=new THREE.PerspectiveCamera(
+    let renderer = new THREE.WebGLRenderer();
 
-70,
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
 
-window.innerWidth/window.innerHeight,
+    document.body.appendChild(renderer.domElement);
 
-0.1,
 
-5000
 
-);
+    let light = new THREE.DirectionalLight(
+        0xffffff,
+        2
+    );
 
+    light.position.set(50,100,50);
 
+    scene.add(light);
 
-renderer=new THREE.WebGLRenderer({
 
-antialias:true
 
-});
+    let car = new THREE.Mesh(
 
+        new THREE.BoxGeometry(2,1,4),
 
-renderer.setSize(
+        new THREE.MeshLambertMaterial({
+            color:cars[selectedCar].color
+        })
 
-window.innerWidth,
+    );
 
-window.innerHeight
 
-);
+    car.position.y=0.5;
 
+    scene.add(car);
 
-document.body.appendChild(renderer.domElement);
 
 
+    camera.position.set(
+        0,
+        5,
+        10
+    );
 
 
 
-let light=new THREE.DirectionalLight(
+    let speed=0;
 
-0xffffff,
 
-2
+    let keys={};
 
-);
 
-light.position.set(
+    document.addEventListener("keydown",e=>{
+        keys[e.key.toLowerCase()]=true;
+    });
 
-100,
 
-200,
+    document.addEventListener("keyup",e=>{
+        keys[e.key.toLowerCase()]=false;
+    });
 
-100
 
-);
 
-scene.add(light);
+    function loop(){
 
+        requestAnimationFrame(loop);
 
 
+        if(keys["w"]){
+            speed=0.2;
+        }
 
 
-// Stadt Boden
+        car.translateZ(speed);
 
-let ground=new THREE.Mesh(
 
-new THREE.PlaneGeometry(
+        camera.position.set(
+            car.position.x,
+            car.position.y+5,
+            car.position.z+10
+        );
 
-3000,
 
-3000
+        camera.lookAt(car.position);
 
-),
 
-new THREE.MeshLambertMaterial({
+        document.getElementById("speed").innerHTML =
+        Math.round(speed*100)+" km/h";
 
-color:0x339933
 
-})
+        renderer.render(scene,camera);
 
-);
+    }
 
 
-ground.rotation.x=-Math.PI/2;
-
-scene.add(ground);
-
-
-
-
-
-// Straße
-
-let road=new THREE.Mesh(
-
-new THREE.BoxGeometry(
-
-50,
-
-0.1,
-
-3000
-
-),
-
-new THREE.MeshLambertMaterial({
-
-color:0x333333
-
-})
-
-);
-
-
-road.position.y=0.05;
-
-scene.add(road);
-
-
-
-
-
-
-// Auto
-
-let data=cars[selectedCar];
-
-
-car=new THREE.Mesh(
-
-new THREE.BoxGeometry(
-
-2.2,
-
-1,
-
-4.5
-
-),
-
-new THREE.MeshLambertMaterial({
-
-color:data.color
-
-})
-
-);
-
-
-car.position.y=0.5;
-
-scene.add(car);
-
-
-
-animate();
-
-}
-
-
-
-
-
-function animate(){
-
-
-requestAnimationFrame(animate);
-
-
-
-let data=cars[selectedCar];
-
-
-
-// Gas
-
-if(keys["w"]){
-
-speed += data.acceleration;
-
-}
-
-
-// Bremse
-
-if(keys["s"]){
-
-speed -=0.08;
-
-}
-
-
-
-// Geschwindigkeit begrenzen
-
-if(speed>data.maxSpeed){
-
-speed=data.maxSpeed;
-
-}
-
-
-if(speed<-1){
-
-speed=-1;
-
-}
-
-
-
-// Reibung
-
-speed*=0.98;
-
-
-
-
-// Lenken
-
-
-if(keys["a"]){
-
-car.rotation.y+=0.04;
-
-}
-
-
-if(keys["d"]){
-
-car.rotation.y-=0.04;
-
-}
-
-
-
-
-car.translateZ(speed);
-
-
-
-
-
-
-// Kamera
-
-
-if(insideCamera){
-
-
-// Innenansicht
-
-camera.position.set(
-
-car.position.x,
-
-car.position.y+0.8,
-
-car.position.z
-
-);
-
-
-camera.lookAt(
-
-car.position.x,
-
-car.position.y+0.8,
-
-car.position.z-10
-
-);
-
-
-
-}else{
-
-
-// GTA Kamera
-
-camera.position.lerp(
-
-new THREE.Vector3(
-
-car.position.x,
-
-car.position.y+6,
-
-car.position.z+12
-
-),
-
-0.08
-
-);
-
-
-camera.lookAt(car.position);
-
-
-}
-
-
-
-document.getElementById("speed").innerHTML=
-
-Math.round(Math.abs(speed)*100)+" km/h";
-
-
-
-renderer.render(
-
-scene,
-
-camera
-
-);
-
+    loop();
 
 }

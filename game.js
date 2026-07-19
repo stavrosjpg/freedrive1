@@ -1,74 +1,46 @@
-let selectedCar = null;
+let selectedCar="";
 
 
-const cars = {
+const cars={
 
 "Audi RS6":{
 color:0x222222,
-speed:0.35
+max:3.8,
+acc:0.06
 },
-
 
 "BMW M4 Competition":{
 color:0x0066ff,
-speed:0.4
+max:4.2,
+acc:0.07
 },
-
 
 "Mercedes C63":{
 color:0xffffff,
-speed:0.38
+max:4,
+acc:0.065
 }
 
 };
 
 
 
-// AUTO AUSWAHL
+function selectCar(car){
 
-
-document.getElementById("rs6").onclick=function(){
-
-selectCar("Audi RS6");
-
-};
-
-
-document.getElementById("m4").onclick=function(){
-
-selectCar("BMW M4 Competition");
-
-};
-
-
-document.getElementById("c63").onclick=function(){
-
-selectCar("Mercedes C63");
-
-};
-
-
-
-
-
-function selectCar(name){
-
-selectedCar=name;
+selectedCar=car;
 
 document.getElementById("selected").innerHTML=
-
-"Ausgewählt: "+name;
+"Ausgewählt: "+car;
 
 }
 
 
 
+function startGame(){
 
-document.getElementById("start").onclick=function(){
+if(!selectedCar){
 
-if(selectedCar==null){
-
-alert("Bitte erst ein Auto auswählen");
+alert("Auto auswählen");
 
 return;
 
@@ -77,16 +49,14 @@ return;
 
 document.getElementById("garage").style.display="none";
 
-startGame();
+createWorld();
 
-};
-
-
+}
 
 
 
 
-function startGame(){
+function createWorld(){
 
 
 let scene=new THREE.Scene();
@@ -99,48 +69,38 @@ new THREE.Color(0x87ceeb);
 let camera=new THREE.PerspectiveCamera(
 
 70,
-
-window.innerWidth/window.innerHeight,
-
+innerWidth/innerHeight,
 0.1,
-
-1000
+5000
 
 );
 
 
 
 let renderer=new THREE.WebGLRenderer({
-
 antialias:true
-
 });
 
-
 renderer.setSize(
-
-window.innerWidth,
-
-window.innerHeight
-
+innerWidth,
+innerHeight
 );
-
 
 document.body.appendChild(renderer.domElement);
 
 
 
 
-
 let light=new THREE.DirectionalLight(
-
 0xffffff,
-
 2
-
 );
 
-light.position.set(50,100,50);
+light.position.set(
+100,
+200,
+100
+);
 
 scene.add(light);
 
@@ -148,20 +108,20 @@ scene.add(light);
 
 
 
-// Boden
+// große Stadtfläche
 
 let ground=new THREE.Mesh(
 
-new THREE.PlaneGeometry(1000,1000),
+new THREE.PlaneGeometry(
+3000,
+3000
+),
 
 new THREE.MeshLambertMaterial({
-
-color:0x228822
-
+color:0x555555
 })
 
 );
-
 
 ground.rotation.x=-Math.PI/2;
 
@@ -171,32 +131,95 @@ scene.add(ground);
 
 
 
-// Straße
+// Straßen
 
-let road=new THREE.Mesh(
+for(let i=-600;i<=600;i+=200){
+
+
+let road1=new THREE.Mesh(
 
 new THREE.BoxGeometry(
-
-30,
-
+40,
 0.1,
+3000
+),
 
-1000
+new THREE.MeshLambertMaterial({
+color:0x222222
+})
 
+);
+
+road1.position.x=i;
+
+scene.add(road1);
+
+
+
+let road2=new THREE.Mesh(
+
+new THREE.BoxGeometry(
+3000,
+0.1,
+40
+),
+
+new THREE.MeshLambertMaterial({
+color:0x222222
+})
+
+);
+
+road2.position.z=i;
+
+scene.add(road2);
+
+
+}
+
+
+
+
+// Häuser
+
+for(let i=0;i<150;i++){
+
+
+let building=new THREE.Mesh(
+
+new THREE.BoxGeometry(
+40+Math.random()*40,
+80+Math.random()*150,
+40+Math.random()*40
 ),
 
 new THREE.MeshLambertMaterial({
 
-color:0x333333
+color:
+0x888888
 
 })
 
 );
 
 
-road.position.y=0.05;
 
-scene.add(road);
+building.position.x=
+Math.random()*2400-1200;
+
+
+building.position.z=
+Math.random()*2400-1200;
+
+
+building.position.y=
+building.geometry.parameters.height/2;
+
+
+scene.add(building);
+
+
+}
 
 
 
@@ -211,13 +234,9 @@ let data=cars[selectedCar];
 let car=new THREE.Mesh(
 
 new THREE.BoxGeometry(
-
-2,
-
+2.4,
 1,
-
-4
-
+5
 ),
 
 new THREE.MeshLambertMaterial({
@@ -229,40 +248,28 @@ color:data.color
 );
 
 
-car.position.y=0.5;
+car.position.y=1;
 
 scene.add(car);
 
 
 
-
-
-camera.position.set(
-
-0,
-
-5,
-
-10
-
-);
+let speed=0;
 
 
 
 let keys={};
 
-let speed=0;
 
 
-
-document.addEventListener("keydown",function(e){
+document.addEventListener("keydown",e=>{
 
 keys[e.key.toLowerCase()]=true;
 
 });
 
 
-document.addEventListener("keyup",function(e){
+document.addEventListener("keyup",e=>{
 
 keys[e.key.toLowerCase()]=false;
 
@@ -272,51 +279,43 @@ keys[e.key.toLowerCase()]=false;
 
 
 
-function animate(){
+function loop(){
 
 
-requestAnimationFrame(animate);
+requestAnimationFrame(loop);
 
 
 
 if(keys["w"]){
 
-speed=data.speed;
+speed+=data.acc;
 
 }
-
-
-else{
-
-speed*=0.95;
-
-}
-
 
 
 if(keys["s"]){
 
-speed=-0.15;
+speed-=0.1;
 
 }
 
 
+speed*=0.98;
 
 
 
-if(keys["a"]){
+if(speed>data.max)
+speed=data.max;
 
+
+
+if(keys["a"])
 car.rotation.y+=0.04;
 
-}
 
-
-
-if(keys["d"]){
-
+if(keys["d"])
 car.rotation.y-=0.04;
 
-}
 
 
 
@@ -332,9 +331,9 @@ new THREE.Vector3(
 
 car.position.x,
 
-car.position.y+5,
+car.position.y+8,
 
-car.position.z+10
+car.position.z+15
 
 ),
 
@@ -343,30 +342,27 @@ car.position.z+10
 );
 
 
-
 camera.lookAt(car.position);
 
 
 
 document.getElementById("speed").innerHTML=
 
-Math.round(Math.abs(speed)*100)+" km/h";
+Math.round(speed*100)+" km/h";
 
 
 
 renderer.render(
-
 scene,
-
 camera
-
 );
 
 
 }
 
 
-animate();
+
+loop();
 
 
 }

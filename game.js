@@ -1,9 +1,70 @@
-const scene = new THREE.Scene();
+let selectedCar="";
 
-scene.background = new THREE.Color(0x87ceeb);
+let cars={
+
+"Audi RS6":{
+speed:1.2,
+color:0x222222
+},
+
+"BMW M4 Competition":{
+speed:1,
+color:0x0066ff
+},
+
+"Mercedes C63":{
+speed:1.1,
+color:0xffffff
+}
+
+};
 
 
-const camera = new THREE.PerspectiveCamera(
+
+function selectCar(name){
+
+selectedCar=name;
+
+document.getElementById("selected").innerHTML=
+"Ausgewählt: "+name;
+
+}
+
+
+
+function startGame(){
+
+if(selectedCar==""){
+alert("Wähle zuerst ein Auto!");
+return;
+}
+
+document.getElementById("garage").style.display="none";
+
+init();
+
+}
+
+
+
+
+let scene,camera,renderer,car;
+
+let speed=0;
+let turn=0;
+
+
+function init(){
+
+
+scene=new THREE.Scene();
+
+scene.background=
+new THREE.Color(0x87ceeb);
+
+
+
+camera=new THREE.PerspectiveCamera(
 60,
 window.innerWidth/window.innerHeight,
 0.1,
@@ -11,7 +72,8 @@ window.innerWidth/window.innerHeight,
 );
 
 
-const renderer = new THREE.WebGLRenderer({
+
+renderer=new THREE.WebGLRenderer({
 antialias:true
 });
 
@@ -24,22 +86,31 @@ document.body.appendChild(renderer.domElement);
 
 
 
-const light = new THREE.DirectionalLight(
+
+
+let light=new THREE.DirectionalLight(
 0xffffff,
 2
 );
 
-light.position.set(100,200,100);
+light.position.set(
+100,200,100
+);
+
 scene.add(light);
 
 
 
-const ground = new THREE.Mesh(
+
+
+// Stadt Boden
+
+let ground=new THREE.Mesh(
 
 new THREE.PlaneGeometry(3000,3000),
 
 new THREE.MeshLambertMaterial({
-color:0x339933
+color:0x228833
 })
 
 );
@@ -53,10 +124,10 @@ scene.add(ground);
 
 // Straße
 
-const road = new THREE.Mesh(
+let road=new THREE.Mesh(
 
 new THREE.BoxGeometry(
-30,
+40,
 0.1,
 3000
 ),
@@ -74,10 +145,12 @@ scene.add(road);
 
 
 
-
 // Auto
 
-const car = new THREE.Mesh(
+let data=cars[selectedCar];
+
+
+car=new THREE.Mesh(
 
 new THREE.BoxGeometry(
 2,
@@ -86,7 +159,7 @@ new THREE.BoxGeometry(
 ),
 
 new THREE.MeshLambertMaterial({
-color:0x0066ff
+color:data.color
 })
 
 );
@@ -98,8 +171,6 @@ scene.add(car);
 
 
 
-
-
 camera.position.set(
 0,
 6,
@@ -108,43 +179,9 @@ camera.position.set(
 
 
 
-let speed=0;
-let maxSpeed=1;
-let rotation=0;
+animate();
 
-
-
-let keys={};
-
-
-
-document.addEventListener("keydown",e=>{
-keys[e.key]=true;
-});
-
-
-document.addEventListener("keyup",e=>{
-keys[e.key]=false;
-});
-
-
-
-// Handy
-
-gas.ontouchstart=()=>speed=0.3;
-gas.ontouchend=()=>speed=0;
-
-brake.ontouchstart=()=>speed=-0.2;
-brake.ontouchend=()=>speed=0;
-
-
-left.ontouchstart=()=>rotation=0.04;
-left.ontouchend=()=>rotation=0;
-
-
-right.ontouchstart=()=>rotation=-0.04;
-right.ontouchend=()=>rotation=0;
-
+}
 
 
 
@@ -154,23 +191,26 @@ function animate(){
 requestAnimationFrame(animate);
 
 
-
-if(keys["w"])
+if(keys.w)
 speed=0.3;
 
-if(keys["s"])
-speed=-0.2;
-
-
-if(keys["a"])
-rotation=0.04;
-
-if(keys["d"])
-rotation=-0.04;
+else
+speed*=0.95;
 
 
 
-car.rotation.y+=rotation;
+if(keys.a)
+turn=0.04;
+
+else if(keys.d)
+turn=-0.04;
+
+else
+turn=0;
+
+
+
+car.rotation.y+=turn;
 
 car.translateZ(speed);
 
@@ -194,8 +234,7 @@ camera.lookAt(car.position);
 
 
 document.getElementById("speed").innerHTML=
-Math.round(Math.abs(speed)*100)+" km/h";
-
+Math.round(speed*100)+" km/h";
 
 
 renderer.render(
@@ -203,25 +242,20 @@ scene,
 camera
 );
 
+
 }
 
 
-animate();
 
 
+let keys={};
 
 
+document.addEventListener("keydown",e=>{
+keys[e.key]=true;
+});
 
-window.onresize=()=>{
 
-camera.aspect=
-window.innerWidth/window.innerHeight;
-
-camera.updateProjectionMatrix();
-
-renderer.setSize(
-window.innerWidth,
-window.innerHeight
-);
-
-};
+document.addEventListener("keyup",e=>{
+keys[e.key]=false;
+});

@@ -37,7 +37,7 @@ function chooseCar(name){
 
 chosenCar=name;
 
-document.getElementById("carName").innerHTML=
+document.getElementById("carName").innerHTML =
 "Ausgewählt: "+name;
 
 }
@@ -87,41 +87,28 @@ function createWorld(){
 
 scene=new THREE.Scene();
 
-scene.background=
+scene.background =
 new THREE.Color(0x87ceeb);
 
 
 
-
-
 camera=new THREE.PerspectiveCamera(
-
 70,
-
 window.innerWidth/window.innerHeight,
-
 0.1,
-
 5000
-
 );
 
 
 
-
 renderer=new THREE.WebGLRenderer({
-
 antialias:true
-
 });
 
 
 renderer.setSize(
-
 window.innerWidth,
-
 window.innerHeight
-
 );
 
 
@@ -130,49 +117,35 @@ document.body.appendChild(renderer.domElement);
 
 
 
-
-
 let sun=new THREE.DirectionalLight(
-
 0xffffff,
-
 2
-
 );
+
 
 sun.position.set(
-
 100,
-
 200,
-
 100
-
 );
+
 
 scene.add(sun);
 
 
 
 
-
-// Stadt Boden
-
+// Boden
 
 let ground=new THREE.Mesh(
 
 new THREE.PlaneGeometry(
-
 3000,
-
 3000
-
 ),
 
 new THREE.MeshLambertMaterial({
-
 color:0x555555
-
 })
 
 );
@@ -186,9 +159,7 @@ scene.add(ground);
 
 
 
-
 // Straßen
-
 
 for(let i=-1000;i<=1000;i+=200){
 
@@ -196,19 +167,13 @@ for(let i=-1000;i<=1000;i+=200){
 let road1=new THREE.Mesh(
 
 new THREE.BoxGeometry(
-
 50,
-
 0.1,
-
 3000
-
 ),
 
 new THREE.MeshLambertMaterial({
-
 color:0x222222
-
 })
 
 );
@@ -224,19 +189,13 @@ scene.add(road1);
 let road2=new THREE.Mesh(
 
 new THREE.BoxGeometry(
-
 3000,
-
 0.1,
-
 50
-
 ),
 
 new THREE.MeshLambertMaterial({
-
 color:0x222222
-
 })
 
 );
@@ -245,88 +204,60 @@ color:0x222222
 road2.position.z=i;
 
 scene.add(road2);
-
-
-}
-
-
-
-
-
-
-
 // Gebäude
-
 
 for(let i=0;i<200;i++){
 
-
-let height=
-50+Math.random()*200;
+let height = 50 + Math.random()*200;
 
 
-let building=new THREE.Mesh(
+let building = new THREE.Mesh(
 
 new THREE.BoxGeometry(
-
 40+Math.random()*50,
-
 height,
-
 40+Math.random()*50
-
 ),
 
 new THREE.MeshLambertMaterial({
 
-color:
-0x777777+Math.random()*0x222222
+color:0x777777
 
 })
 
 );
 
 
-
-building.position.x=
+building.position.x =
 Math.random()*2500-1250;
 
 
-building.position.z=
+building.position.z =
 Math.random()*2500-1250;
 
 
-building.position.y=
+building.position.y =
 height/2;
 
 
 scene.add(building);
-
 
 }
 
 
 
 
+// Auto erstellen
+
+let data = cars[chosenCar];
 
 
-
-// Auto
-
-
-let data=cars[chosenCar];
-
-
-car=new THREE.Mesh(
+car = new THREE.Mesh(
 
 new THREE.BoxGeometry(
-
 2.5,
-
 1,
-
 5
-
 ),
 
 new THREE.MeshLambertMaterial({
@@ -338,9 +269,7 @@ color:data.color
 );
 
 
-
 car.position.y=1;
-
 
 scene.add(car);
 
@@ -348,22 +277,30 @@ scene.add(car);
 
 
 
-
 camera.position.set(
-
 0,
-
 8,
-
 15
-
 );
 
 
 
 
 
+// Steuerung
+
 let keys={};
+
+
+let mobileKeys={
+
+gas:false,
+brake:false,
+left:false,
+right:false,
+nitro:false
+
+};
 
 
 
@@ -376,7 +313,6 @@ keys[e.key.toLowerCase()]=true;
 });
 
 
-
 document.addEventListener("keyup",e=>{
 
 keys[e.key.toLowerCase()]=false;
@@ -387,10 +323,59 @@ keys[e.key.toLowerCase()]=false;
 
 
 
+// Handy Buttons
+
+function mobileButton(id,key){
+
+let button=document.getElementById(id);
+
+if(!button) return;
+
+
+button.addEventListener("touchstart",()=>{
+
+mobileKeys[key]=true;
+
+});
+
+
+button.addEventListener("touchend",()=>{
+
+mobileKeys[key]=false;
+
+});
+
+
+button.addEventListener("mousedown",()=>{
+
+mobileKeys[key]=true;
+
+});
+
+
+button.addEventListener("mouseup",()=>{
+
+mobileKeys[key]=false;
+
+});
+
+}
+
+
+
+mobileButton("gas","gas");
+mobileButton("brake","brake");
+mobileButton("left","left");
+mobileButton("right","right");
+mobileButton("nitro","nitro");
+
+
+
+
+
 
 
 function update(){
-
 
 
 requestAnimationFrame(update);
@@ -400,18 +385,29 @@ requestAnimationFrame(update);
 
 // Gas
 
-if(keys["w"]){
+if(keys["w"] || mobileKeys.gas){
 
-speed+=data.acceleration;
+speed += data.acceleration;
 
 }
 
 
 
+// Nitro
 
-if(keys["s"]){
+if(mobileKeys.nitro){
 
-speed-=0.1;
+speed += 0.15;
+
+}
+
+
+
+// Bremse
+
+if(keys["s"] || mobileKeys.brake){
+
+speed -=0.1;
 
 }
 
@@ -430,8 +426,6 @@ speed=data.maxSpeed;
 }
 
 
-
-
 if(speed<-1){
 
 speed=-1;
@@ -441,19 +435,17 @@ speed=-1;
 
 
 
-
-
 // Lenken
 
-
-if(keys["a"]){
+if(keys["a"] || mobileKeys.left){
 
 car.rotation.y+=0.04;
 
 }
 
 
-if(keys["d"]){
+
+if(keys["d"] || mobileKeys.right){
 
 car.rotation.y-=0.04;
 
@@ -464,7 +456,6 @@ car.rotation.y-=0.04;
 
 
 car.translateZ(speed);
-
 
 
 
@@ -499,7 +490,6 @@ car.position.z-10
 );
 
 
-
 }
 
 else{
@@ -532,7 +522,8 @@ camera.lookAt(car.position);
 
 
 
-document.getElementById("speed").innerHTML=
+
+document.getElementById("speed").innerHTML =
 
 Math.round(speed*100)+" km/h";
 
@@ -550,13 +541,45 @@ camera
 );
 
 
-
 }
+
 
 
 
 update();
 
 
+
+
+
+
+// Handy Bildschirm Anpassung
+
+window.addEventListener("resize",()=>{
+
+
+camera.aspect =
+
+window.innerWidth/window.innerHeight;
+
+
+camera.updateProjectionMatrix();
+
+
+
+renderer.setSize(
+
+window.innerWidth,
+
+window.innerHeight
+
+);
+
+
+});
+
+
+
+}
 
 }
